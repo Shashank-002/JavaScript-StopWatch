@@ -11,26 +11,31 @@ const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
 const resetButton = document.getElementById('resetButton');
 const lapButton = document.getElementById('lapButton');  
-const lapDisplay = document.getElementById('lapDisplay');  
+const lapTableBody = document.getElementById('lapTableBody');  
 
 startButton.addEventListener('click', startStopwatch);
 stopButton.addEventListener('click', stopStopwatch);
 resetButton.addEventListener('click', resetStopwatch);
 lapButton.addEventListener('click', recordLapTime);  
 
-// Initially hide the stop button
+// Initially hide the stop, reset, and lap buttons
 stopButton.style.display = 'none';
+resetButton.style.display = 'none';
+lapButton.style.display = 'none';
+lapButton.disabled = true; 
 
-// Function to start the stopwatch
 function startStopwatch() {
     if (!isRunning) {
         startTime = Date.now() - savedTime;  
         timeUpdateIntervalId = setInterval(updateTimeDisplay, 10);  
         isRunning = true;
         
-        // Hide the start button and show the stop button
+        // Show the stop, reset, and lap buttons, hide start button
         startButton.style.display = 'none';
         stopButton.style.display = 'inline-block';
+        resetButton.style.display = 'inline-block';
+        lapButton.style.display = 'inline-block';
+        lapButton.disabled = false;
     }
 }
 
@@ -40,28 +45,50 @@ function stopStopwatch() {
         clearInterval(timeUpdateIntervalId);  
         isRunning = false;
 
-        // Hide the stop button and show the start button
+        // Hide stop button and show start button
         stopButton.style.display = 'none';
         startButton.style.display = 'inline-block';
+        lapButton.disabled = true; 
     }
 }
 
-// Function to reset the stopwatch
 function resetStopwatch() {
     clearInterval(timeUpdateIntervalId);  
     isRunning = false;
     savedTime = 0;  
     timeDisplay.textContent = formatMainDisplayTime(0);  
     lapTimes = [];  
-    lapDisplay.innerHTML = '';  
+    lapTableBody.innerHTML = '';  
     lastLapTime = 0;  
 
-    // Show start button and hide stop button after reset
+    // Hide reset and lap buttons, show start button, hide stop button
     startButton.style.display = 'inline-block';
     stopButton.style.display = 'none';
+    resetButton.style.display = 'none';
+    lapButton.style.display = 'none';
+    lapButton.disabled = true;
 }
 
-// Function to record lap time
+let lapDisplay = document.querySelector('.lap-display');
+let isLapVisible = false; 
+
+// Lap button logic
+document.querySelector('#lapButton').addEventListener('click', function() {
+    if (!isLapVisible) {
+        lapDisplay.style.display = 'block';
+        isLapVisible = true;
+    }
+
+});
+
+// Reset button logic
+document.querySelector('#resetButton').addEventListener('click', function() {
+    lapDisplay.style.display = 'none';
+    isLapVisible = false; 
+
+});
+
+
 function recordLapTime() {
     if (isRunning) {
         const currentLapTime = updatedTime;
@@ -70,46 +97,35 @@ function recordLapTime() {
         lastLapTime = currentLapTime;  
 
         const lapNumber = lapTimes.length;
-        const lapText = `Lap ${lapNumber}: ${formatLapTime(lapGap)}`;
-        const lapElement = document.createElement('div');
-        lapElement.textContent = lapText;
-        lapDisplay.appendChild(lapElement);
+        const lapText = formatMainDisplayTime(currentLapTime);
+        const lapDiff = formatMainDisplayTime(lapGap);
+
+        // Add a new row at the top of the table
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `<td>${lapNumber}</td><td>${lapDiff}</td><td>${lapText}</td>`;
+        lapTableBody.insertBefore(newRow, lapTableBody.firstChild);
     }
 }
 
-// Function to update the time display
+
 function updateTimeDisplay() {
     updatedTime = Date.now() - startTime;  
     timeDisplay.textContent = formatMainDisplayTime(updatedTime); 
 }
 
-// Helper function to format time for main display (hh:mm:ss:ms hidden until needed)
+// Helper function to format time for main display
 function formatMainDisplayTime(milliseconds) {
     const totalSeconds = Math.floor(milliseconds / 1000);  
-    const hours = Math.floor(totalSeconds / 3600);  // Calculate hours
-    const minutes = Math.floor((totalSeconds % 3600) / 60);  // Calculate remaining minutes
+    const hours = Math.floor(totalSeconds / 3600);  
+    const minutes = Math.floor((totalSeconds % 3600) / 60);  
     const seconds = totalSeconds % 60;  
-    const millis = Math.floor((milliseconds % 1000)/10); 
+    const millis = Math.floor((milliseconds % 1000) / 10); 
 
-    // Format time as mm:ss:ms if hours are 0, else as hh:mm:ss:ms
     return hours > 0 
         ? `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}:${padTime(millis)}`
         : `${padTime(minutes)}:${padTime(seconds)}:${padTime(millis)}`;
 }
 
-// Helper function to format time for lap display (always show hours)
-function formatLapTime(milliseconds) {
-    const totalSeconds = Math.floor(milliseconds / 1000);  
-    const hours = Math.floor(totalSeconds / 3600);  // Calculate hours
-    const minutes = Math.floor((totalSeconds % 3600) / 60);  // Calculate remaining minutes
-    const seconds = totalSeconds % 60;  
-    const millis = Math.floor((milliseconds % 1000)/10); 
-
-    // Always show hours
-    return `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}:${padTime(millis)}`;
-}
-
-// Helper function to pad time with leading zero if needed
 function padTime(time) {
     return time.toString().padStart(2, '0');
 }
