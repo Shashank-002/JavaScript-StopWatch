@@ -5,37 +5,39 @@ let timeUpdateIntervalId;
 let isRunning = false;
 let lapTimes = [];  
 let lastLapTime = 0;  
+let isLapVisible = false; 
 
 const timeDisplay = document.getElementById('timeDisplay');
 const startButton = document.getElementById('startButton');
 const stopButton = document.getElementById('stopButton');
-const resetButton = document.getElementById('resetButton');
 const lapButton = document.getElementById('lapButton');  
+const resetButton = document.getElementById('resetButton');  
 const lapTableBody = document.getElementById('lapTableBody');  
+let lapDisplay = document.querySelector('.lap-display');
+
 
 startButton.addEventListener('click', startStopwatch);
 stopButton.addEventListener('click', stopStopwatch);
 resetButton.addEventListener('click', resetStopwatch);
-lapButton.addEventListener('click', recordLapTime);  
+lapButton.addEventListener('click', recordLapTime);
 
-// Initially hide the stop, reset, and lap buttons
-stopButton.style.display = 'none';
-resetButton.style.display = 'none';
-lapButton.style.display = 'none';
-lapButton.disabled = true; 
+HideButton({ start: true, stop: false, lap: false, reset: false });
+lapButton.disabled = true;
+
+function HideButton({ start = false, stop = false, lap = false, reset = false }) {
+    startButton.style.display = start ? 'inline-block' : 'none';
+    stopButton.style.display = stop ? 'inline-block' : 'none';
+    lapButton.style.display = lap ? 'inline-block' : 'none';
+    resetButton.style.display = reset ? 'inline-block' : 'none';
+}
 
 function startStopwatch() {
     if (!isRunning) {
         startTime = Date.now() - savedTime;  
-        timeUpdateIntervalId = setInterval(updateTimeDisplay, 10);  
+        timeUpdateIntervalId = setInterval(refreshStopwatchDisplay, 10);  
         isRunning = true;
-        
-        // Show the stop, reset, and lap buttons, hide start button
-        startButton.style.display = 'none';
-        stopButton.style.display = 'inline-block';
-        resetButton.style.display = 'inline-block';
-        lapButton.style.display = 'inline-block';
-        lapButton.disabled = false;
+        HideButton({ start: false, stop: true, lap: true, reset: true });
+        lapButton.disabled = false;  
     }
 }
 
@@ -44,10 +46,7 @@ function stopStopwatch() {
         savedTime = Date.now() - startTime;  
         clearInterval(timeUpdateIntervalId);  
         isRunning = false;
-
-        // Hide stop button and show start button
-        stopButton.style.display = 'none';
-        startButton.style.display = 'inline-block';
+        HideButton({ start: true, stop: false, lap: true, reset: true });
         lapButton.disabled = true; 
     }
 }
@@ -60,60 +59,42 @@ function resetStopwatch() {
     lapTimes = [];  
     lapTableBody.innerHTML = '';  
     lastLapTime = 0;  
-
-    // Hide reset and lap buttons, show start button, hide stop button
-    startButton.style.display = 'inline-block';
-    stopButton.style.display = 'none';
-    resetButton.style.display = 'none';
-    lapButton.style.display = 'none';
+    HideButton({ start: true, stop: false, lap: false, reset: false });
     lapButton.disabled = true;
-}
-
-let lapDisplay = document.querySelector('.lap-display');
-let isLapVisible = false; 
-
-// Lap button logic
-document.querySelector('#lapButton').addEventListener('click', function() {
-    if (!isLapVisible) {
-        lapDisplay.style.display = 'block';
-        isLapVisible = true;
-    }
-
-});
-
-// Reset button logic
-document.querySelector('#resetButton').addEventListener('click', function() {
     lapDisplay.style.display = 'none';
-    isLapVisible = false; 
-
-});
-
+    isLapVisible = false;
+}
 
 function recordLapTime() {
     if (isRunning) {
-        const currentLapTime = updatedTime;
-        lapTimes.push(currentLapTime);  
-        const lapGap = currentLapTime - lastLapTime;  
-        lastLapTime = currentLapTime;  
+        refreshStopwatchDisplay(); 
 
-        const lapNumber = lapTimes.length;
-        const lapText = formatMainDisplayTime(currentLapTime);
-        const lapDiff = formatMainDisplayTime(lapGap);
+        const totalLapTime = currentTime; 
+        lapTimes.push(totalLapTime);  
+        const lapDuration = totalLapTime - lastLapTime;  
+        lastLapTime = totalLapTime;  
 
-        // Add a new row at the top of the table
+        const lapSerialNumber = lapTimes.length;
+        const formattedLapTime = formatMainDisplayTime(totalLapTime);  
+        const formattedLapDuration = formatMainDisplayTime(lapDuration);  
+
         const newRow = document.createElement('tr');
-        newRow.innerHTML = `<td>${lapNumber}</td><td>${lapDiff}</td><td>${lapText}</td>`;
+        newRow.innerHTML = `<td>${lapSerialNumber}</td><td>${formattedLapDuration}</td><td>${formattedLapTime}</td>`;
         lapTableBody.insertBefore(newRow, lapTableBody.firstChild);
+
+        if (!isLapVisible) {
+            lapDisplay.style.display = 'block';
+            isLapVisible = true;
+        }
     }
 }
 
 
-function updateTimeDisplay() {
-    updatedTime = Date.now() - startTime;  
-    timeDisplay.textContent = formatMainDisplayTime(updatedTime); 
+function refreshStopwatchDisplay() {
+    currentTime = Date.now() - startTime;  
+    timeDisplay.textContent = formatMainDisplayTime(currentTime); 
 }
 
-// Helper function to format time for main display
 function formatMainDisplayTime(milliseconds) {
     const totalSeconds = Math.floor(milliseconds / 1000);  
     const hours = Math.floor(totalSeconds / 3600);  
