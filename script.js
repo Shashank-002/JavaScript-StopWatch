@@ -21,10 +21,10 @@ stopButton.addEventListener('click', stopStopwatch);
 resetButton.addEventListener('click', resetStopwatch);
 lapButton.addEventListener('click', recordLapTime);
 
-HideButton({ start: true, stop: false, lap: false, reset: false });
+toggleButtonVisibility({ start: true, stop: false, lap: false, reset: false });
 lapButton.disabled = true;
 
-function HideButton({ start = false, stop = false, lap = false, reset = false }) {
+function toggleButtonVisibility({ start, stop, lap, reset  }) {
     startButton.style.display = start ? 'inline-block' : 'none';
     stopButton.style.display = stop ? 'inline-block' : 'none';
     lapButton.style.display = lap ? 'inline-block' : 'none';
@@ -36,7 +36,7 @@ function startStopwatch() {
         startTime = Date.now() - savedTime;  
         timeUpdateIntervalId = setInterval(refreshStopwatchDisplay, 10);  
         isRunning = true;
-        HideButton({ start: false, stop: true, lap: true, reset: true });
+        toggleButtonVisibility({ stop: true, lap: true, reset: true });
         lapButton.disabled = false;  
     }
 }
@@ -46,7 +46,7 @@ function stopStopwatch() {
         savedTime = Date.now() - startTime;  
         clearInterval(timeUpdateIntervalId);  
         isRunning = false;
-        HideButton({ start: true, stop: false, lap: true, reset: true });
+        toggleButtonVisibility({ start: true, lap: true, reset: true });
         lapButton.disabled = true; 
     }
 }
@@ -59,7 +59,7 @@ function resetStopwatch() {
     lapTimes = [];  
     lapTableBody.innerHTML = '';  
     lastLapTime = 0;  
-    HideButton({ start: true, stop: false, lap: false, reset: false });
+    toggleButtonVisibility({ start: true });
     lapButton.disabled = true;
     lapDisplay.style.display = 'none';
     isLapVisible = false;
@@ -96,11 +96,11 @@ function refreshStopwatchDisplay() {
 }
 
 function formatMainDisplayTime(milliseconds) {
-    const totalSeconds = Math.floor(milliseconds / 1000);  
-    const hours = Math.floor(totalSeconds / 3600);  
-    const minutes = Math.floor((totalSeconds % 3600) / 60);  
-    const seconds = totalSeconds % 60;  
-    const millis = Math.floor((milliseconds % 1000) / 10); 
+    const date = new Date(milliseconds);
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const seconds = date.getUTCSeconds();
+    const millis = Math.floor(date.getUTCMilliseconds() / 10); 
 
     return hours > 0 
         ? `${padTime(hours)}:${padTime(minutes)}:${padTime(seconds)}:${padTime(millis)}`

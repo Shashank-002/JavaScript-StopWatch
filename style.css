@@ -13,8 +13,8 @@ body {
     text-align: center;
     background-color: #ffa500;
     padding: 60px 100px;
-    border-radius: 2px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
 }
 
 h1, h2 {
@@ -45,7 +45,8 @@ h1, h2 {
 }
 
 .btn:hover {
-    background-color: #ea9c09;
+    background-color: white;
+    color: #ea9c09;
 }
 
 .btn:disabled {
@@ -102,7 +103,7 @@ th, td {
         text-align: center;
         background-color: #ffa500;
         padding: 60px;
-        border-radius: 2px;
+        border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
@@ -160,7 +161,7 @@ th, td {
         text-align: center;
         background-color: #ffa500;
         padding: 40px;
-        border-radius: 2px;
+        border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
@@ -219,7 +220,7 @@ th, td {
         background-color: #ffa500;
         padding: 60px 40px;
         margin: 0px 20px;
-        border-radius: 2px;
+        border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
@@ -341,7 +342,7 @@ th, td {
         background-color: #ffa500;
         padding: 40px;
         margin: 0px 20px;
-        border-radius: 2px;
+        border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
@@ -403,8 +404,8 @@ th, td {
         background-color: #ffa500;
         padding: 40px 20px;
         margin: 0px 10px;
-        border-radius: 2px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3);
     }
     
     h1, h2 {
@@ -462,7 +463,7 @@ th, td {
         background-color: #ffa500;
         padding: 120px 240px;
         margin: 0px 10px;
-        border-radius: 2px;
+        border-radius: 5px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
